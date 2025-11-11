@@ -1,4 +1,13 @@
-Data/
+# Data files
+Data/creditcard.csv
 *.csv
+
+# Models
+models/*.pkl
+
+# Virtual env
 venv/
-__pycache__/
+.env
+
+# Notebook checkpoints
+.ipynb_checkpoints/
