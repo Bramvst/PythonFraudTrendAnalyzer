@@ -1,27 +1,31 @@
+import os
 import pandas as pd
 import joblib
 
-def main():
-    # Laad model
-    model_path = "Models/fraude_random_forest.pkl"
-    model = joblib.load(model_path)
+# ==== Paths ====
+data_path = os.path.join("Data", "creditcard.csv")
+model_dir = "models"
+model_path = os.path.join(model_dir, "fraude_random_forest.pkl")
+scaler_path = os.path.join(model_dir, "scaler.pkl")
 
-    # Laad dataset (zorg dat je Data/creditcard.csv hebt)
-    data_path = "Data/creditcard.csv"
-    df = pd.read_csv(data_path)
+# ==== Load model and scaler ====
+if not os.path.exists(model_path) or not os.path.exists(scaler_path):
+    raise FileNotFoundError("Train the model first! Run 'train_model.py'")
 
-    # Drop target column als die er is
-    if "Class" in df.columns:
-        X = df.drop(columns=["Class"])
-    else:
-        X = df.copy()
+rf_model = joblib.load(model_path)
+scaler = joblib.load(scaler_path)
 
-    # Voorspel
-    predictions = model.predict(X)
+# ==== Load data ====
+df = pd.read_csv(data_path)
+X = df.drop(columns=["Class"], errors="ignore")
 
-    # Toon eerste 10 voorspellingen
-    print("First 10 predictions:")
-    print(predictions[:10])
+# ==== Scale features ====
+X_scaled = scaler.transform(X)
 
-if __name__ == "__main__":
-    main()
+# ==== Predict ====
+predictions = rf_model.predict(X_scaled)
+
+# ==== Show summary ====
+print(f"Total transactions: {len(predictions)}")
+print(f"Predicted fraud cases: {sum(predictions)}")
+print("First 10 predictions:", predictions[:10])
